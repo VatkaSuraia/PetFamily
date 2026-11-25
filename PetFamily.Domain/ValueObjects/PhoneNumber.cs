@@ -1,17 +1,27 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects;
 
-public sealed record PhoneNumber : ValueObject
+public sealed class PhoneNumber : ValueObject
 {
     public string Value { get; }
 
-    public PhoneNumber(string value)
+    public PhoneNumber(string value, out UnitResult<Error> result)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException("Номер телефона не может быть пустым.", nameof(value));
+        result = Validate(value);
+        if (result.IsFailure)
+            return;
 
         Value = value;
+    }
+    
+    private UnitResult<Error> Validate(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Error.Validation("phone.is.invalid", "Номер телефона не может быть пустым");
+
+        return UnitResult.Success<Error>();
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

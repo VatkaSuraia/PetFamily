@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects;
 
@@ -9,18 +10,27 @@ public sealed class Address : ValueObject
     public string Street { get; }
     public string House { get; }
 
-    public Address(string city, string street, string house)
+    public Address(string city, string street, string house, out UnitResult<Error> result)
     {
-        if (string.IsNullOrWhiteSpace(city))
-            throw new ArgumentException("Город обязателен.", nameof(city));
-        if (string.IsNullOrWhiteSpace(street))
-            throw new ArgumentException("Улица обязательна.", nameof(street));
-        if (string.IsNullOrWhiteSpace(house))
-            throw new ArgumentException("Дом обязателен.", nameof(house));
+        result = Validate(city, street, house);
+        if (result.IsFailure)
+            return;
 
         City = city;
         Street = street;
         House = house;
+    }
+    
+    private UnitResult<Error> Validate(string city, string street, string house)
+    {
+        if (string.IsNullOrWhiteSpace(city) || 
+            string.IsNullOrWhiteSpace(street) || 
+            string.IsNullOrWhiteSpace(house))
+        {
+            return Error.Validation("address.is.invalid", "Город, улица и дом обязательны");
+        }
+
+        return UnitResult.Success<Error>();
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
