@@ -1,30 +1,34 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using PetFamily.infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();  
+builder.Services.AddControllers();
 
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddEndpointsApiExplorer(); 
+
+builder.Services.AddOpenApi(); 
+
+builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "PetFamily API",
-        Version = "v1",
-        Description = "Базовое API приюта. Доменный слой: Pet, Volunteer (w1-w2)."
-    });
+    options.UseNpgsql(builder.Configuration.GetConnectionString("VolunteerDb"));
+    options.UseLoggerFactory(sp.GetRequiredService<ILoggerFactory>());
+    options.EnableSensitiveDataLogging();
 });
-
  
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(ui =>
-    {
-        ui.SwaggerEndpoint("/swagger/v1/swagger.json", "PetFamily API v1");
-    });
+    app.MapOpenApi("/swagger/v1/swagger.json");
+
+    app.UseSwaggerUI(options =>
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "PetFamily API v1")
+    );
 }
+
 
 // app.UseSerilogRequestLogging();
 
