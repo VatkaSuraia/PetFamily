@@ -22,7 +22,12 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
     options.EnableSensitiveDataLogging();
 });
 
+builder.Services.AddDbContext<ReadDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("VolunteerDb"))
+        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
 builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>(); // Web → Infrastructure только здесь
+builder.Services.AddScoped<IVolunteerReadRepository, VolunteerReadRepository>();
 builder.Services.AddScoped<VolunteerService>();
  
 var app = builder.Build();

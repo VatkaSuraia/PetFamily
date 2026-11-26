@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace PetFamily.infrastructure;
 
-public class ApplicationDbContext : DbContext
+public  class ApplicationDbContext : DbContext
 {
     private ApplicationDbContext() {}
     

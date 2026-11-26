@@ -4,15 +4,8 @@ using PetFamily.infrastructure;
 
 namespace PetFamily.Infrastructure;
 
-public class VolunteerRepository : IVolunteerRepository
+public class VolunteerRepository(ApplicationDbContext db) : IVolunteerRepository
 {
-    private VolunteerRepository() {}
-    public VolunteerRepository(ApplicationDbContext dbContext)
-    { 
-        db = dbContext;
-    }
-    private ApplicationDbContext db;
-    
     public async Task AddAsync(Volunteer volunteer, CancellationToken ct = default)
     {
         db.Volunteers.Add(volunteer);

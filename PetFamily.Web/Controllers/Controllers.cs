@@ -18,11 +18,21 @@ public sealed class VolunteersController(VolunteerService service) : ControllerB
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> Get(Guid id, CancellationToken ct)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
-        var result = await service.GetAsync(id, ct);
+        var result = await service.GetByIdAsync(id, ct);
         return result.IsSuccess
             ? Ok(result.Value)
             : NotFound(new ErrorResponse(result.Error.Code, result.Error.Message));
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken ct = default)
+    {
+        var result = await service.GetPagedAsync(page, pageSize, ct);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : BadRequest(new ErrorResponse(result.Error.Code, result.Error.Message)); // 400
     }
 }

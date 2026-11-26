@@ -20,7 +20,11 @@ public sealed class Volunteer : Entity<Guid>
 
     public IReadOnlyCollection<SocialNetwork> SocialNetworks => _socialNetworks.AsReadOnly();
     public IReadOnlyCollection<Requisites> Requisites => _requisites.AsReadOnly();
-    public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();          // [W3]
+    public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly(); // [W3]
+    
+    public bool IsDeleted { get; private set; }
+    public void Delete() => IsDeleted = true;
+
 
     private Volunteer(
         Guid id,
