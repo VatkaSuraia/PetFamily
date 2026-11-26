@@ -7,6 +7,8 @@ public sealed class SocialNetwork : ValueObject
 {
     public string Name { get; }
     public string Link { get; }
+    
+    public string Value => $"name: {Name}, link: {Link}"; 
 
     public SocialNetwork(string name, string link, out UnitResult<Error> result)
     {

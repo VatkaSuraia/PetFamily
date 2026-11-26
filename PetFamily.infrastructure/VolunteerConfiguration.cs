@@ -14,9 +14,7 @@ public sealed class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.Property(v => v.Id)
             .HasColumnName("id")
             .ValueGeneratedNever(); // Id создаётся в домене, не БД
-
-        // --- Одиночные VO: OwnsOne -> колонки в той же таблице volunteers ---
-
+        
         builder.OwnsOne(v => v.FullName, fn =>
         {
             fn.Property(x => x.FirstName).HasColumnName("first_name").HasMaxLength(100).IsRequired();
@@ -36,18 +34,24 @@ public sealed class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             p.Property(x => x.Value).HasColumnName("phone_number").HasMaxLength(20);
         });
 
-        // --- Коллекция VO: OwnsMany + ToJson -> один jsonb-столбец ---
-
         builder.OwnsMany(v => v.SocialNetworks, sn =>
         {
             sn.ToJson("social_networks");
             sn.Property(x => x.Name).HasJsonPropertyName("name");
             sn.Property(x => x.Link).HasJsonPropertyName("url");
         });
-
-        // Пишем/читаем через backing-поле, чтобы не ломать инкапсуляцию агрегата.
+        
         builder.Navigation(v => v.SocialNetworks)
             .HasField("_socialNetworks")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Property(v => v.ExperienceYears).HasColumnName("experience_years");
+        builder.Property(v => v.Description).HasColumnName("description").HasMaxLength(1000);
+        builder.Ignore(v => v.Pets); // [W3] — pets на этой неделе не мапим
+
+        builder.OwnsMany(v => v.Requisites, r => r.ToJson("requisites"));
+        builder.Navigation(v => v.Requisites)
+            .HasField("_requisites")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

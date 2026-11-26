@@ -8,6 +8,7 @@ namespace PetFamily.Domain;
 public sealed class Volunteer : Entity<Guid>
 {
     private readonly List<SocialNetwork> _socialNetworks;
+    private readonly List<Requisites> _requisites;
     private readonly List<Pet> _pets; // [W3] на этапе W2 не заполняется
 
     public Guid Id { get; private set; }
@@ -16,9 +17,9 @@ public sealed class Volunteer : Entity<Guid>
     public int ExperienceYears { get; private set; }         
     public string? Description { get; private set; }          
     public PhoneNumber PhoneNumber { get; private set; }              
-    public Requisites Requisites { get; private set; }                 
 
     public IReadOnlyCollection<SocialNetwork> SocialNetworks => _socialNetworks.AsReadOnly();
+    public IReadOnlyCollection<Requisites> Requisites => _requisites.AsReadOnly();
     public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();          // [W3]
 
     private Volunteer(
@@ -28,7 +29,7 @@ public sealed class Volunteer : Entity<Guid>
         int experienceYears,
         string? description,
         PhoneNumber phoneNumber,
-        Requisites requisites,
+        IEnumerable<Requisites>? requisites = null,
         IEnumerable<SocialNetwork>? socialNetworks = null)
         : base(id)
     {
@@ -38,7 +39,7 @@ public sealed class Volunteer : Entity<Guid>
         ExperienceYears = experienceYears;
         Description = description;
         PhoneNumber = phoneNumber;
-        Requisites = requisites;
+        _requisites = requisites?.ToList() ?? new List<Requisites>();
         _socialNetworks = socialNetworks?.ToList() ?? new List<SocialNetwork>();
         _pets = new List<Pet>(); // [W3]
     }
@@ -50,7 +51,7 @@ public sealed class Volunteer : Entity<Guid>
         int experienceYears,
         string? description,
         PhoneNumber phoneNumber,
-        Requisites requisites,
+        IEnumerable<Requisites>? requisites = null,
         IEnumerable<SocialNetwork>? socialNetworks = null)
     {
         if (id == Guid.Empty)
@@ -72,13 +73,13 @@ public sealed class Volunteer : Entity<Guid>
             requisites,
             socialNetworks);
     }
-
+    //для EF
     private Volunteer() { }
 
     public void AddSocialNetwork(SocialNetwork socialNetwork) => _socialNetworks.Add(socialNetwork);
-
-    // [W3] раскомментировать, когда питомцы будут связаны с волонтёром
-    // public void AddPet(Pet pet) => _pets.Add(pet);
+    public void AddRequisites(Requisites requisites) => _requisites.Add(requisites);
+    public void AddPet(Pet pet) => _pets.Add(pet);
+    
     public int GetFoundHomePetsCount(IReadOnlyCollection<Pet> pets)
         => pets.Count(p => p.HelpStatus == HelpStatus.FoundHome);
 

@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using PetFamily.Aplication;
+using PetFamily.Domain;
 using PetFamily.infrastructure;
+using PetFamily.Infrastructure;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +21,9 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
     options.UseLoggerFactory(sp.GetRequiredService<ILoggerFactory>());
     options.EnableSensitiveDataLogging();
 });
+
+builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>(); // Web → Infrastructure только здесь
+builder.Services.AddScoped<VolunteerService>();
  
 var app = builder.Build();
 
@@ -30,7 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-// app.UseSerilogRequestLogging();
+//app.UseSerilogRequestLogging();
 
 app.MapControllers();
 

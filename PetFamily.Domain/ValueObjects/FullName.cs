@@ -9,8 +9,10 @@ public sealed class FullName : ValueObject
     public string FirstName { get; }
     public string LastName { get; }
     public string? MiddleName { get; }
+    
+    public string Value  => $"{FirstName} {LastName} {MiddleName}"; 
 
-    public FullName(string firstName, string lastName, out UnitResult<Error> result, string? middleName = null)
+    public FullName(string firstName, string? middleName, string lastName, out UnitResult<Error> result)
     {
         result = Validate(firstName, lastName);
         if (result.IsFailure)
